@@ -17,6 +17,6 @@ def image_to_array(path):
         return np.array(img)
 
 
-def array_to_image(arr):
+def array_to_image(arr, path):
     img = Image.fromarray(arr)
     img.save('result.bmp')

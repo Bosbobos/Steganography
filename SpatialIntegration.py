@@ -30,7 +30,7 @@ def pvd_encode(imgPath, msg):
             print(int16(img[i][j][0]) - int16(img[i][j+1][0]), end=' ')
             print(m)
             if cnt + 1 >= len(binMsg):
-                Img.array_to_image(img)
+                Img.array_to_image(img, 'output/'+imgPath)
                 return
 
 
