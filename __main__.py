@@ -1,15 +1,22 @@
 import SpatialIntegration as SI
 
 msg = '''Please choose the method:
-0: exit
-1: PVD
-'''
+    0: exit
+    1: PVD
+    '''
 
-def get_image_name():
-    return input('Put the image into "input" folder and write its name: ')
+
+def get_image_path():
+    return input('Write the path to the image: ')
+
 
 def get_message():
     return input('Write the message to encode: ')
+
+
+def get_bits():
+    return int(input('Write the number of bits to decode (you can start with 200 and increase if needed): '))
+
 
 def PVD():
     msg = '''Please choose the operation:
@@ -19,9 +26,17 @@ def PVD():
     op = int(input(msg))
     match op:
         case 1:
-            name = get_image_name()
-            SI.pvd_encode('input/' + name, get_message())
-            print('The picture with encoded message is in folder "output".')
+            name = get_image_path()
+            SI.pvd_encode(name, get_message())
+            print('The picture with encoded message is in the output folder.')
+        case 2:
+            name = get_image_path()
+            bits = get_bits()
+            message = SI.pvd_decode(name, bits)
+            print(message)
+        case _:
+            raise Exception("Unknown command")
+
 
 if __name__=='__main__':
     operation = int(input(msg))
