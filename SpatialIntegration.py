@@ -32,6 +32,10 @@ def pvd_encode(imgPath, msg):
                 Img.array_to_image(img, path)
                 return
 
+    i = len(imgPath) - 1 - imgPath[::-1].index('/') if '/' in imgPath else 0  #Finds file name without directories
+    path = 'output/' + imgPath[i:]
+    Img.array_to_image(img, path)
+
 
 def pvd_decode(imgPath, size=200):
     img = Img.image_to_array(imgPath)
@@ -48,3 +52,5 @@ def pvd_decode(imgPath, size=200):
             binMsg += f'{m:0{n}b}'
             if len(binMsg) >= size:
                 return Img.binary_to_string(binMsg[:size+1])
+
+    return Img.binary_to_string(binMsg)

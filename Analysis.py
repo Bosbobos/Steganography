@@ -16,10 +16,10 @@ def find_max_size(imgPath):
     return cnt
 
 
-print(find_max_size('input/example1.bmp'))
+print(find_max_size('input/lasttry.png'))
 
 
 def find_bin_text_length(text):
     return len(Img.string_to_binary(text))
-
-print(find_bin_text_length(input()))
+while 1:
+    print(find_bin_text_length(input()))

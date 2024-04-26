@@ -39,10 +39,14 @@ def PVD():
 
 
 if __name__=='__main__':
-    operation = int(input(msg))
-    while (operation != 0):
-        match operation:
-            case 1:
-                PVD()
-            case _:
-                raise Exception("Unknown command")
+    while True:
+        message = get_message()
+        SI.pvd_encode('input/lasttry.png', message)
+        print(SI.pvd_decode('output/lasttry.png', 6480))
+    #operation = int(input(msg))
+    #while (operation != 0):
+    #    match operation:
+    #        case 1:
+    #            PVD()
+    #        case _:
+    #            raise Exception("Unknown command")
