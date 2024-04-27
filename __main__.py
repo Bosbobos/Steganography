@@ -39,10 +39,10 @@ def PVD():
 
 
 if __name__=='__main__':
-    while True:
-        message = get_message()
-        SI.pvd_encode('input/lasttry.png', message)
-        print(SI.pvd_decode('output/lasttry.png', 6480))
+    with open('input_text.txt', 'r') as f:
+        message = ''.join(i.strip() for i in f.readlines())
+        SI.pvd_encode('input/tiger.png', message)
+        print(SI.pvd_decode('output/tiger.png', 460000))
     #operation = int(input(msg))
     #while (operation != 0):
     #    match operation:
