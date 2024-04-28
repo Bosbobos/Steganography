@@ -1,4 +1,4 @@
-import ImageWrapper as Img
+import ImageManager as Img
 from math import floor, log2
 from numpy import int16
 
