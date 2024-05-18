@@ -8,8 +8,9 @@ def image_to_array(path):
         return np.array(img)
 
 
-def array_to_image(arr, path):
+def array_to_image(arr, path, greyscale=False):
     img = Image.fromarray(arr)
+    if greyscale: img = img.convert('L')
     img.save(path)
 
 
