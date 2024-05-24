@@ -1,6 +1,6 @@
 import ImageManager as Img
 import numpy as np
-from scipy.fft import dct
+from scipy.fft import dct, idct
 
 
 def arnold(matrix):
@@ -41,41 +41,43 @@ def embed_into_block_dct(block_dct, next_dct, wm_bit):
     med = np.median(ac)
     dc = block_dct[0, 0]
     diff = abs(dc - med)
-    if (abs(dc) > 1000 or abs(dc) < 1) and med != 0.0 or diff > 0.0001:
+    if abs(dc) > 1000 or abs(dc) < 1:
         mod_power = abs(2 * med)
     else:
         mod_power = abs(2 * diff / dc)
 
-    next = next_dct[3, 3]
-    delta = block_dct[3, 3] - next
+    mod_power = max(0.01, mod_power)
+
+    next = next_dct[4, 4]
+    delta = block_dct[4, 4] - next
 
     t, k = 80, 12
     if wm_bit == 1:
         if delta > t - k:
             while delta > t - k:
-                block_dct[3, 3] -= mod_power
-                delta = block_dct[3, 3] - next
+                block_dct[4, 4] -= mod_power
+                delta = block_dct[4, 4] - next
         elif k > delta > -t/2:
             while delta < k:
-                block_dct[3, 3] += mod_power
-                delta = block_dct[3, 3] - next
+                block_dct[4, 4] += mod_power
+                delta = block_dct[4, 4] - next
         elif delta < -t/2:
             while delta > -t - k:
-                block_dct[3, 3] -= mod_power
-                delta = block_dct[3, 3] - next
+                block_dct[4, 4] -= mod_power
+                delta = block_dct[4, 4] - next
     else:
         if delta > t/2:
             while delta <= t+k:
-                block_dct[3, 3] += mod_power
-                delta = block_dct[3, 3] - next
+                block_dct[4, 4] += mod_power
+                delta = block_dct[4, 4] - next
         elif -k < delta < t/2:
             while delta >= -k:
-                block_dct[3, 3] -= mod_power
-                delta = block_dct[3, 3] - next
+                block_dct[4, 4] -= mod_power
+                delta = block_dct[4, 4] - next
         elif delta < k-t:
             while delta <= k-t:
-                block_dct[3, 3] += mod_power
-                delta = block_dct[3, 3] - next
+                block_dct[4, 4] += mod_power
+                delta = block_dct[4, 4] - next
 
 def DKP_difference(imgPath, watermarkPath):
     img = Img.image_to_array(imgPath)
@@ -88,16 +90,14 @@ def DKP_difference(imgPath, watermarkPath):
         for j in range(0, width-8, 8):
             block = np.int16(img[i:i+8, j:j+8, 0]) - 128
             next = np.int16(img[i:i+8, j+8:j+16, 0]) - 128
-            block_dct = dct(block, norm="ortho")
-            next_dct = dct(next, norm="ortho")
+            block_dct = dct(dct(block, axis=0, norm='ortho'), axis=1, norm='ortho')
+            next_dct = dct(dct(next, axis=0, norm='ortho'), axis=1, norm='ortho')
 
             embed_into_block_dct(block_dct, next_dct, wm[z])
 
             #unedited_image = dct(block_dct, norm="ortho", type=3)
-
-
-
-            img[i:i+8, j:j+8, 0] = np.uint8(dct(block_dct, norm="ortho", type=3) + 128)
+            
+            img[i:i+8, j:j+8, 0] = np.uint8(idct(idct(block_dct, axis=0, norm='ortho'), axis=1, norm='ortho') + 128)
             z += 1
 
     i = len(imgPath) - 1 - imgPath[::-1].index('/') if '/' in imgPath else 0  #Finds file name without directories
@@ -106,7 +106,7 @@ def DKP_difference(imgPath, watermarkPath):
 
 
 def extract_from_block_dct(block_dct, next_dct):
-    delta = block_dct[3, 3] - next_dct[3, 3]
+    delta = block_dct[4, 4] - next_dct[4, 4]
     t, k = 80, 12
     if delta < -t or 0 < delta < t:
         return 1
@@ -123,8 +123,8 @@ def DKP_difference_extract(imgPath):
         for j in range(8, width-8, 8):
             block = np.int16(img[i:i+8, j:j+8, 0]) - 128
             next = np.int16(img[i:i+8, j+8:j+16, 0]) - 128
-            block_dct = dct(block, norm="ortho")
-            next_dct = dct(next, norm="ortho")
+            block_dct = dct(dct(block, axis=0, norm='ortho'), axis=1, norm='ortho')
+            next_dct = dct(dct(next, axis=0, norm='ortho'), axis=1, norm='ortho')
 
             wm[z] = extract_from_block_dct(block_dct, next_dct)
             z += 1
@@ -135,7 +135,5 @@ def DKP_difference_extract(imgPath):
     path = ''.join(['output/', 'WM', imgPath[i:]])
     Img.array_to_image(watermark, path, True)
 
-from SpatialIntegration import calibrate_image as ci
-ci('input/newest.png', 8)
-DKP_difference('output/newest.png', 'input/wm.png')
-DKP_difference_extract('output/newest.png')
+DKP_difference('input/newest_calibrated.png', 'input/wm.png')
+DKP_difference_extract('output/newest_calibrated.png')
