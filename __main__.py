@@ -1,10 +1,16 @@
 import SpatialIntegration as SI
 import TextManager as TM
+import Watermark as WM
 
 msg = '''Please choose the method:
     0: exit
-    1: PVD
+    1: PVD text
+    2: DKP watermark
     '''
+
+
+def get_watermark_path():
+    return input('Write the path to the watermark image: ')
 
 
 def get_image_path():
@@ -55,11 +61,32 @@ def PVD():
             raise Exception("Unknown command")
 
 
+def DKP():
+    msg = '''Please choose the operation:
+    1: Embed watermark
+    2: Extract watermark
+    '''
+    op = int(input(msg))
+    match op:
+        case 1:
+            name = get_image_path()
+            watermark = get_watermark_path()
+            WM.DKP_difference(name, watermark)
+        case 2:
+            name = get_image_path()
+            message = WM.DKP_difference_extract(name)
+            print('Watermark can be found in output/WM')
+        case _:
+            raise Exception("Unknown command")
+
+
 if __name__=='__main__':
     operation = int(input(msg))
     while operation != 0:
        match operation:
-           case 1:
+            case 1:
                PVD()
-           case _:
+            case 2:
+                DKP()
+            case _:
                raise Exception("Unknown command")

@@ -109,13 +109,11 @@ def DKP_difference(imgPath, watermarkPath):
 def DKP_difference_extract(imgPath):
     img = Img.image_to_array(imgPath)
     width, height, _ = img.shape
-    num_blocks_x = width // 8
-    num_blocks_y = height // 8
     wm = np.zeros(width*height//64, dtype=np.uint8)
     z = 0
     T = 80
-    for block_i in range(num_blocks_y):
-        for block_j in range(num_blocks_x - 1):
+    for block_i in range(height // 8):
+        for block_j in range(width // 8 - 1):
             block = [[img[block_i * 8 + i][block_j * 8 + j][1] - 128 for j in range(8)] for i in range(8)]
             block_dct = dct(dct(block, axis=0, norm='ortho'), axis=1, norm='ortho')
             delta = block_dct[4][4]
@@ -126,7 +124,3 @@ def DKP_difference_extract(imgPath):
     i = len(imgPath) - 1 - imgPath[::-1].index('/') if '/' in imgPath else 0  #Finds file name without directories
     path = ''.join(['output/', 'WM', imgPath[i:]])
     Img.array_to_image(watermark, path, True)
-
-
-DKP_difference('input/newest.png', 'input/wm.png')
-DKP_difference_extract('output/newest.png')
